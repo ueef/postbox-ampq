@@ -1,5 +1,5 @@
 {
-  "name": "ueef/postbox-ampq-driver",
+  "name": "ueef/postbox-ampq",
   "type": "library",
   "require": {
     "php": ">=7.0.1",
