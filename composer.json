@@ -1,0 +1,15 @@
+{
+  "name": "ueef/postbox-ampq-driver",
+  "type": "library",
+  "require": {
+    "php": ">=7.0.1",
+    "php-amqplib/php-amqplib": "2.6.*",
+    "ueef/postbox": "*",
+    "ueef/assignable": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Ueef\\Postbox\\Drivers\\": "src"
+    }
+  }
+}
