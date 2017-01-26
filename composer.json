@@ -1,5 +1,5 @@
 {
-  "name": "ueef/postbox-ampq",
+  "name": "ueef/postbox-amqp",
   "type": "library",
   "require": {
     "php": ">=7.0.1",
