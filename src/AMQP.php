@@ -5,6 +5,7 @@ namespace Ueef\Postbox\Drivers {
     use PhpAmqpLib\Message\AMQPMessage;
     use PhpAmqpLib\Channel\AMQPChannel;
     use PhpAmqpLib\Connection\AMQPStreamConnection;
+    use Ueef\Postbox\Interfaces\DriverInterface;
     use Ueef\Assignable\Traits\AssignableTrait;
     use Ueef\Assignable\Interfaces\AssignableInterface;
 
