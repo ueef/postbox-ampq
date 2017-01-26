@@ -66,10 +66,9 @@ namespace Ueef\Postbox\Drivers {
             }
         }
 
-        public function send(string $to, string $message): bool
+        public function send(string $to, string $message)
         {
             $this->channel->basic_publish(new AMQPMessage($message), '', $to);
-            return true;
         }
 
         public function request(string $to, string $message): string
