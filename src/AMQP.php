@@ -60,10 +60,12 @@ namespace Ueef\Postbox\Drivers {
                     $response = new AMQPMessage($response, ['correlation_id' => $message->get('correlation_id')]);
                     $message->delivery_info['channel']->basic_publish($response, '', $message->get('reply_to'));
                 }
+
+                $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
             };
 
             $this->channel->queue_declare($from, false, false, false, false);
-            $this->channel->basic_consume($from, '', false, true, false, false, $handler);
+            $this->channel->basic_consume($from, '', false, false, false, false, $handler);
 
             while(count($this->channel->callbacks)) {
                 $this->channel->wait();
@@ -84,6 +86,9 @@ namespace Ueef\Postbox\Drivers {
                 if($rep->get('correlation_id') == $correlationId) {
 
                     $rep->delivery_info['channel']->basic_ack($rep->delivery_info['delivery_tag']);
+                    //удаление текущего обработчика из канала
+                    $rep->delivery_info['channel']->basic_cancel($rep->delivery_info['consumer_tag']);
+
                     $response = $rep->body;
                 }
             };
