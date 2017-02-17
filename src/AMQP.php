@@ -38,6 +38,10 @@ namespace Ueef\Postbox\Drivers {
          */
         private $channel;
 
+        /**
+         * @var string
+         */
+        private $callbackQueue;
 
         public function __construct(array $parameters = [])
         {
@@ -78,16 +82,20 @@ namespace Ueef\Postbox\Drivers {
 
             $handler = function (AMQPMessage $rep) use (&$response, $correlationId) {
                 if($rep->get('correlation_id') == $correlationId) {
+
+                    $rep->delivery_info['channel']->basic_ack($rep->delivery_info['delivery_tag']);
                     $response = $rep->body;
                 }
             };
 
-            list($queue, ,) = $this->channel->queue_declare('', false, false, true, false);
-            $this->channel->basic_consume($queue, '', false, false, false, false, $handler);
+            if (empty($this->callbackQueue)) {
+                list($this->callbackQueue, ,) = $this->channel->queue_declare('', false, false, true, false);
+            }
+            $this->channel->basic_consume($this->callbackQueue, '', false, false, false, false, $handler);
 
             $msg = new AMQPMessage($message, [
                 'correlation_id' => $correlationId,
-                'reply_to' => $queue
+                'reply_to' => $this->callbackQueue
             ]);
 
             $this->channel->basic_publish($msg, '', $to);
