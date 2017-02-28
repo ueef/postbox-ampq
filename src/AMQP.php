@@ -65,6 +65,7 @@ namespace Ueef\Postbox\Drivers {
             };
 
             $this->channel->queue_declare($from, false, false, false, false);
+            $this->channel->basic_qos(null, 1, null);
             $this->channel->basic_consume($from, '', false, false, false, false, $handler);
 
             while(count($this->channel->callbacks)) {
