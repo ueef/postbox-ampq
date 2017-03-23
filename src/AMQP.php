@@ -38,6 +38,10 @@ namespace Ueef\Postbox\Drivers {
          */
         private $channel;
 
+        private $canSafelyExit = true;
+
+        private $mustExit = false;
+
         /**
          * @var string
          */
@@ -53,6 +57,7 @@ namespace Ueef\Postbox\Drivers {
 
         public function wait(string $from, callable $callback)
         {
+            $this->registerSignalHandlers();
             $handler = function (AMQPMessage $message) use ($callback) {
                 $response = call_user_func($callback, $message->getBody());
 
@@ -62,6 +67,10 @@ namespace Ueef\Postbox\Drivers {
                 }
 
                 $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
+
+                if ($this->mustExit) {
+                    exit(0);
+                }
             };
 
             $this->channel->queue_declare($from, false, false, false, false);
@@ -106,11 +115,27 @@ namespace Ueef\Postbox\Drivers {
 
             $this->channel->basic_publish($msg, '', $to);
 
+            $this->canSafelyExit = false;
             while(!$response) {
                 $this->channel->wait();
             }
+            $this->canSafelyExit = true;
 
             return $response;
+        }
+
+        private function registerSignalHandlers()
+        {
+            $signalHandler = function () {
+                if ($this->canSafelyExit) {
+                    exit(0);
+                }
+
+                $this->mustExit = true;
+            };
+
+            pcntl_signal(SIGINT, $signalHandler);
+            pcntl_signal(SIGTERM, $signalHandler);
         }
     }
 }
