@@ -4,8 +4,8 @@
   "require": {
     "php": ">=7.0.1",
     "php-amqplib/php-amqplib": "2.6.*",
-    "ueef/postbox": "*",
-    "ueef/assignable": "*"
+    "ueef/postbox": "0.2.15",
+    "ueef/assignable": "0.0.4"
   },
   "autoload": {
     "psr-4": {
