@@ -55,7 +55,13 @@ namespace Ueef\Postbox\Drivers {
             $this->channel = $connection->channel();
         }
 
-        public function wait(string $from, callable $callback)
+        public function wait() {
+            while(count($this->channel->callbacks)) {
+                $this->channel->wait();
+            }
+        }
+
+        public function consume(string $from, callable $callback)
         {
             $this->registerSignalHandlers();
             $handler = function (AMQPMessage $message) use ($callback) {
@@ -76,10 +82,6 @@ namespace Ueef\Postbox\Drivers {
             $this->channel->queue_declare($from, false, false, false, false);
             $this->channel->basic_qos(null, 1, null);
             $this->channel->basic_consume($from, '', false, false, false, false, $handler);
-
-            while(count($this->channel->callbacks)) {
-                $this->channel->wait();
-            }
         }
 
         public function send(string $to, string $message)
